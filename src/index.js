@@ -1,14 +1,11 @@
-import dva from "dva";
+import dva, { connect } from "dva";
 import { Component } from "react";
 import "./index.css";
 
 // 1. Initialize
 const app = dva();
 
-// 2. Plugins
-// app.use({});
-
-// 3. Model
+// 2. Model
 // app.model(require('./models/example').default);
 app.model({
   namespace: "count",
@@ -34,8 +31,36 @@ class TestError extends Component {
     return <div>TestError</div>;
   }
 }
+
+// 3. View
+const App = connect(({ count }) => ({
+  count
+}))(function(props) {
+  return (
+    <div>
+      <TestError />
+      <h2>{props.count}</h2>
+      <button
+        key="add"
+        onClick={() => {
+          props.dispatch({ type: "count/add" });
+        }}
+      >
+        +
+      </button>
+      <button
+        key="minus"
+        onClick={() => {
+          props.dispatch({ type: "count/minus" });
+        }}
+      >
+        -
+      </button>
+    </div>
+  );
+});
 // 4. Router
-app.router(require("./router").default);
+app.router(() => <App />);
 
 // 5. Start
 app.start("#root");
